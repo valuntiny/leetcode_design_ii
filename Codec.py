@@ -24,16 +24,17 @@ class Codec:
         :type root: TreeNode
         :rtype: str
         """
-        val = []
-
         def preorder(root):
             if root:
                 val.append(root.val)
                 preorder(root.left)
                 preorder(root.right)
+            else:
+                val.append("*")
 
+        val = []
         preorder(root)
-        return ''.join(map(str, val))
+        return ','.join(map(str, val))
 
     def deserialize(self, data):
         """Decodes your encoded data to tree.
@@ -41,19 +42,18 @@ class Codec:
         :type data: str
         :rtype: TreeNode
         """
-        data = list(map(int, data.split()))
-        stk = []
-        root = node = TreeNode[data[0]]
-        for n in data[1,]:
-            if n < node.val:
-                node.left = TreeNode[n]
-                stk.append(node)
-                node = node.left
-            else:
-                while stk and n > stk[-1].val:
-                    node = stk.pop()
-                node.right = TreeNode[n]
-                node = node.right
+
+        def doit():
+            val = next(vals)
+            if val == '*':
+                return None
+            root = TreeNode(int(val))
+            root.left = doit() # during recursion, vals can be called iteratively
+            root.right = doit()
+            return root
+
+        vals = iter(data.split(",")) # an iteration object
+        return doit()
 
 # Your Codec object will be instantiated and called as such:
 # codec = Codec()
